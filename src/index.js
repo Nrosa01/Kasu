@@ -18,7 +18,8 @@ client.on('ready', () => {
 
 client.on('messageCreate', async (message) => 
 {
-   if(!message?.author.bot && message.author.id !== "490599226200424448" && message.channel.name === "arte-bonito-rioni")
+//    if(!message?.author.bot && message.author.id !== "490599226200424448" && message.channel.name === "arte-bonito-rioni")
+   if(!message?.author.bot && message.author.id === "490599226200424448" && message.channel.name === "general")
    {
     message.reply("¿Tú te llamas Rioni? No, claro que no, porque te llamas " + message.member.displayName);
    } 
