@@ -41,7 +41,7 @@ for (const file of commandFiles) {
 
 client.player = new Player(client, {
     ytdlOptions: {
-        quality: 'highestaudio',
+        filter: 'audioonly',
         highWaterMark: 1 << 25,
     },
 });
