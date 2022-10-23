@@ -1,7 +1,6 @@
 import { SlashCommandBuilder } from "@discordjs/builders"
 import pkg from "discord.js"
 const { EmbedBuilder } = pkg
-// import { MessageEmbed } from "discord.js"
 import { QueryType } from "discord-player"
 
 export default {

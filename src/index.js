@@ -8,9 +8,10 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'url';
 
+// import * as server from './keep_alive.js'
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-// import * as server from './keep_alive.js'
 
 dotenv.config();
 
@@ -33,11 +34,9 @@ const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('
 for (const file of commandFiles) {
     const filePath = pathToFileURL(path.join(commandsPath, file)).href;
     const command = await import(filePath);
-    console.log("COMMAND: ", command.default.data.name);
 
     client.commands.set(command.default.data.name, command);
     commands.push(command.default.data.toJSON());
-    //commands.push(JSON.stringify(command));
 }
 
 client.player = new Player(client, {
