@@ -1,6 +1,6 @@
 import { SlashCommandBuilder } from "@discordjs/builders"
 import pkg from "discord.js"
-const { EmbedBuilder } = pkg
+const { EmbedBuilder, ActionRowBuilder, ButtonBuilder } = pkg
 import { QueryType } from "discord-player"
 
 export default {
@@ -92,23 +92,74 @@ export default {
 
             // finish if no tracks were found
             if (result.tracks.length === 0)
+
                 return interaction.editReply("No results")
 
+            // Loop through the results and add them to the embed
+            var maxResults = 5
+
+            let i = 0
+            for (const track of result.tracks) {
+                if (i >= maxResults) break
+                embed.addFields({ name: `${i+1}. ${track.title}`, value: `Duration: ${track.duration}` })
+                i++
+            }
+
+            // Build row of buttons using loop
+            let row = new ActionRowBuilder()
+            for (let i = 0; i < maxResults; i++) {
+                row.addComponents(new ButtonBuilder()
+                    .setLabel(`${i + 1}`)
+                    .setStyle("Primary")
+                    .setCustomId(`play${i + 1}`)
+                )
+            }
+
+            await interaction.reply({ embeds: [embed], components: [row] })
+
+            // Create a collector for the buttons using promisified awaitMessageComponent
+            const filter = (button) => button.user.id === interaction.user.id
+            const collector = await interaction.channel.awaitMessageComponent({ filter, time: 15000 })
+
+            // Tell messageComponent that we are done with it
+            collector.deferUpdate()
+
+            // Get the button that was clicked
+            const button = collector.customId
+
+            // Get the index of the button
+            const index = button.replace("play", "") - 1
+
             // Add the track to the queue
-            const song = result.tracks[0]
+            const song = result.tracks[index]
             await queue.addTrack(song)
+
+            // Clear embed
+            embed = new EmbedBuilder()
+
             embed
                 .setDescription(`**[${song.title}](${song.url})** has been added to the Queue`)
                 .setThumbnail(song.thumbnail)
                 .setFooter({ text: `Duration: ${song.duration}` })
         }
 
+
         // Play the song
         if (!queue.playing) await queue.play()
 
         // Respond with the embed containing information about the player
-        await interaction.reply({
-            embeds: [embed]
-        })
+        try
+        {
+
+            await interaction.reply({
+                embeds: [embed]
+            })
+        }
+        catch (e)
+        {
+            await interaction.followUp({
+                embeds: [embed]
+            })
+        }
     },
 };
